@@ -26,6 +26,7 @@ let contacts = [
 ];
 
 app.get('/info', (request, response) => {
+  console.log('Getting Info');
   const contactsNumber = contacts.length;
   const date = Date();
   response.send(
@@ -33,8 +34,20 @@ app.get('/info', (request, response) => {
   );
 });
 
-app.get('/api/notes', (request, response) => {
+app.get('/api/contacts', (request, response) => {
+  console.log('Getting all contacts');
   response.json(contacts);
+});
+
+app.get('/api/contacts/:id', (req, res) => {
+  console.log('Getting single contact');
+  const id = Number(req.params.id);
+  const contact = contacts.find((contact) => contact.id === id);
+  if (contact) {
+    res.json(contact);
+  } else {
+    res.status(404).end();
+  }
 });
 
 const PORT = 3001;
