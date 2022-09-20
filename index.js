@@ -25,6 +25,14 @@ let contacts = [
   },
 ];
 
+app.get('/info', (request, response) => {
+  const contactsNumber = contacts.length;
+  const date = Date();
+  response.send(
+    `<p>Phonebook has ${contactsNumber} contacts</p><p>${date.toString()}</p>`
+  );
+});
+
 app.get('/api/notes', (request, response) => {
   response.json(contacts);
 });
