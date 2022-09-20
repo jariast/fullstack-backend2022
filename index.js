@@ -58,6 +58,12 @@ app.post('/api/contacts', (req, res) => {
 
   const newContact = { id, ...req.body };
 
+  const isInvalidMsg = isInvalidConctact(newContact);
+  if (isInvalidMsg) {
+    res.status(400).json({ error: isInvalidMsg });
+    return;
+  }
+
   contacts = contacts.concat(newContact);
 
   res.json(newContact);
@@ -69,6 +75,18 @@ app.delete('/api/contacts/:id', (req, res) => {
   contacts = contacts.filter((contact) => contact.id !== id);
   res.status(204).end();
 });
+
+const isInvalidConctact = (newContact) => {
+  if (!newContact.name || !newContact.number) {
+    return 'Contacts must have a name and a number';
+  }
+
+  if (contacts.find((contact) => contact.name === newContact.name)) {
+    return 'Contact must have a unique name';
+  }
+
+  return null;
+};
 
 const PORT = 3001;
 app.listen(PORT, () => {
