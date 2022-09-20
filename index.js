@@ -2,6 +2,8 @@ const express = require('express');
 
 const app = express();
 
+app.use(express.json());
+
 let contacts = [
   {
     id: 1,
@@ -48,6 +50,17 @@ app.get('/api/contacts/:id', (req, res) => {
   } else {
     res.status(404).end();
   }
+});
+
+app.post('/api/contacts', (req, res) => {
+  console.log('Posting single contact');
+  const id = Math.floor(Math.random() * 99999);
+
+  const newContact = { id, ...req.body };
+
+  contacts = contacts.concat(newContact);
+
+  res.json(newContact);
 });
 
 app.delete('/api/contacts/:id', (req, res) => {
