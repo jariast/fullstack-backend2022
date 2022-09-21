@@ -1,7 +1,11 @@
 const express = require('express');
 const morgan = require('morgan');
 
-morgan.token('body', (req) => JSON.stringify(req.body));
+morgan.token('body', (req) => {
+  return req.method === 'POST'
+    ? JSON.stringify(req.body)
+    : 'Request has no body';
+});
 
 const app = express();
 
