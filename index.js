@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -9,6 +10,7 @@ morgan.token('body', (req) => {
 });
 
 const app = express();
+const Contact = require('./models/contact');
 
 app.use(express.json());
 app.use(express.static('build'));
@@ -51,7 +53,9 @@ app.get('/info', (request, response) => {
 
 app.get('/api/contacts', (request, response) => {
   console.log('Getting all contacts');
-  response.json(contacts);
+  Contact.find({}).then((contacts) => {
+    response.json(contacts);
+  });
 });
 
 app.get('/api/contacts/:id', (req, res) => {
@@ -101,7 +105,7 @@ const isInvalidConctact = (newContact) => {
   return null;
 };
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
