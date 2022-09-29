@@ -11,6 +11,7 @@ morgan.token('body', (req) => {
 
 const app = express();
 const Contact = require('./models/contact');
+const { response } = require('express');
 
 app.use(express.json());
 app.use(express.static('build'));
@@ -71,19 +72,29 @@ app.get('/api/contacts/:id', (req, res) => {
 
 app.post('/api/contacts', (req, res) => {
   console.log('Posting single contact');
-  const id = Math.floor(Math.random() * 99999);
+  // const id = Math.floor(Math.random() * 99999);
 
-  const newContact = { id, ...req.body };
+  // const newContact = { id, ...req.body };
 
-  const isInvalidMsg = isInvalidConctact(newContact);
+  const body = req.body;
+
+  const isInvalidMsg = isInvalidConctact(body);
   if (isInvalidMsg) {
     res.status(400).json({ error: isInvalidMsg });
     return;
   }
+  const contact = new Contact({
+    name: body.name,
+    number: body.number,
+  });
 
-  contacts = contacts.concat(newContact);
+  contact.save().then((savedContact) => {
+    res.json(savedContact);
+  });
 
-  res.json(newContact);
+  // contacts = contacts.concat(newContact);
+
+  // res.json(newContact);
 });
 
 app.delete('/api/contacts/:id', (req, res) => {
