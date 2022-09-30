@@ -63,12 +63,13 @@ app.post('/api/contacts', (req, res, next) => {
   });
 
   contact.save().then((savedContact) => {
+    console.log('New contact created', savedContact);
     res.json(savedContact);
   });
 });
 
 app.delete('/api/contacts/:id', (req, res, next) => {
-  const id = req.params.id + '123123213123';
+  const id = req.params.id;
   console.log('Deleting single contact with id: ', id);
   Contact.findByIdAndRemove(id)
     .then(() => res.status(204).end())
@@ -84,9 +85,9 @@ const isInvalidConctact = (newContact) => {
     return 'Contacts must have a name and a number';
   }
 
-  if (contacts.find((contact) => contact.name === newContact.name)) {
-    return 'Contact must have a unique name';
-  }
+  // if (contacts.find((contact) => contact.name === newContact.name)) {
+  //   return 'Contact must have a unique name';
+  // }
 
   return null;
 };
