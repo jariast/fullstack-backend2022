@@ -20,29 +20,6 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
-let contacts = [
-  {
-    id: 1,
-    name: 'Arto Hellas',
-    number: '040-123456',
-  },
-  {
-    id: 2,
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-  },
-  {
-    id: 3,
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-  },
-  {
-    id: 4,
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-  },
-];
-
 app.get('/info', (request, response) => {
   console.log('Getting Info');
   const contactsNumber = contacts.length;
@@ -72,9 +49,6 @@ app.get('/api/contacts/:id', (req, res) => {
 
 app.post('/api/contacts', (req, res) => {
   console.log('Posting single contact');
-  // const id = Math.floor(Math.random() * 99999);
-
-  // const newContact = { id, ...req.body };
 
   const body = req.body;
 
@@ -91,17 +65,17 @@ app.post('/api/contacts', (req, res) => {
   contact.save().then((savedContact) => {
     res.json(savedContact);
   });
-
-  // contacts = contacts.concat(newContact);
-
-  // res.json(newContact);
 });
 
 app.delete('/api/contacts/:id', (req, res) => {
-  console.log('Deleting single contact');
-  const id = Number(req.params.id);
-  contacts = contacts.filter((contact) => contact.id !== id);
-  res.status(204).end();
+  const id = req.params.id;
+  console.log('Deleting single contact with id: ', id);
+  Contact.findByIdAndRemove(id)
+    .then(() => res.status(204).end())
+    .catch((error) => {
+      console.log(error);
+      res.status(500).end();
+    });
 });
 
 const isInvalidConctact = (newContact) => {
