@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const errHandler = require('./error');
 
 morgan.token('body', (req) => {
   return req.method === 'POST'
@@ -11,7 +12,6 @@ morgan.token('body', (req) => {
 
 const app = express();
 const Contact = require('./models/contact');
-const { response } = require('express');
 
 app.use(express.json());
 app.use(express.static('build'));
@@ -47,14 +47,14 @@ app.get('/api/contacts/:id', (req, res) => {
   }
 });
 
-app.post('/api/contacts', (req, res) => {
+app.post('/api/contacts', (req, res, next) => {
   console.log('Posting single contact');
 
   const body = req.body;
 
   const isInvalidMsg = isInvalidConctact(body);
   if (isInvalidMsg) {
-    res.status(400).json({ error: isInvalidMsg });
+    next({ name: 'InvalidContact', message: isInvalidMsg });
     return;
   }
   const contact = new Contact({
@@ -67,16 +67,17 @@ app.post('/api/contacts', (req, res) => {
   });
 });
 
-app.delete('/api/contacts/:id', (req, res) => {
-  const id = req.params.id;
+app.delete('/api/contacts/:id', (req, res, next) => {
+  const id = req.params.id + '123123213123';
   console.log('Deleting single contact with id: ', id);
   Contact.findByIdAndRemove(id)
     .then(() => res.status(204).end())
     .catch((error) => {
-      console.log(error);
-      res.status(500).end();
+      next(error);
     });
 });
+
+app.use(errHandler);
 
 const isInvalidConctact = (newContact) => {
   if (!newContact.name || !newContact.number) {
