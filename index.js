@@ -52,7 +52,7 @@ app.post('/api/contacts', (req, res, next) => {
 
   const body = req.body;
 
-  const isInvalidMsg = isInvalidConctact(body);
+  const isInvalidMsg = isInvalidContact(body);
   if (isInvalidMsg) {
     next({ name: 'InvalidContact', message: isInvalidMsg });
     return;
@@ -78,18 +78,26 @@ app.delete('/api/contacts/:id', (req, res, next) => {
     });
 });
 
+app.put('/api/contacts/:id', (req, res, next) => {
+  const id = req.params.id;
+  const resBody = req.body;
+
+  const contact = {
+    name: resBody.name,
+    number: resBody.number,
+  };
+
+  Contact.findByIdAndUpdate(id, contact, { new: true })
+    .then((updatedContact) => res.json(updatedContact))
+    .catch((error) => next(error));
+});
+
 app.use(errHandler);
 
-const isInvalidConctact = (newContact) => {
-  if (!newContact.name || !newContact.number) {
-    return 'Contacts must have a name and a number';
-  }
-
-  // if (contacts.find((contact) => contact.name === newContact.name)) {
-  //   return 'Contact must have a unique name';
-  // }
-
-  return null;
+const isInvalidContact = (newContact) => {
+  return !newContact.name || !newContact.number
+    ? 'Contacts must have a name and a number'
+    : null;
 };
 
 const PORT = process.env.PORT;
