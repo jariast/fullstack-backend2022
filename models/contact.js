@@ -8,8 +8,15 @@ mongoose
   .catch((err) => console.log('Error connecting to MongoDB: ', err.message));
 
 const contactSchema = new mongoose.Schema({
-  name: String,
-  number: Number,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
+  number: {
+    type: Number,
+    required: true,
+  },
 });
 
 contactSchema.set('toJSON', {

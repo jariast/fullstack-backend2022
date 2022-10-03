@@ -56,20 +56,18 @@ app.post('/api/contacts', (req, res, next) => {
 
   const body = req.body;
 
-  const isInvalidMsg = isInvalidContact(body);
-  if (isInvalidMsg) {
-    next({ name: 'InvalidContact', message: isInvalidMsg });
-    return;
-  }
   const contact = new Contact({
     name: body.name,
     number: body.number,
   });
 
-  contact.save().then((savedContact) => {
-    console.log('New contact created', savedContact);
-    res.json(savedContact);
-  });
+  contact
+    .save()
+    .then((savedContact) => {
+      console.log('New contact created', savedContact);
+      res.json(savedContact);
+    })
+    .catch((error) => next(error));
 });
 
 app.delete('/api/contacts/:id', (req, res, next) => {
@@ -91,18 +89,16 @@ app.put('/api/contacts/:id', (req, res, next) => {
     number: resBody.number,
   };
 
-  Contact.findByIdAndUpdate(id, contact, { new: true })
+  Contact.findByIdAndUpdate(id, contact, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  })
     .then((updatedContact) => res.json(updatedContact))
     .catch((error) => next(error));
 });
 
 app.use(errHandler);
-
-const isInvalidContact = (newContact) => {
-  return !newContact.name || !newContact.number
-    ? 'Contacts must have a name and a number'
-    : null;
-};
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
