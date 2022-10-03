@@ -22,11 +22,14 @@ app.use(
 
 app.get('/info', (request, response) => {
   console.log('Getting Info');
-  const contactsNumber = contacts.length;
-  const date = Date();
-  response.send(
-    `<p>Phonebook has ${contactsNumber} contacts</p><p>${date.toString()}</p>`
-  );
+  Contact.find({}).then((contacts) => {
+    const date = Date();
+
+    const contactsNumber = contacts.length ?? 0;
+    response.send(
+      `<p>Phonebook has ${contactsNumber} contacts</p><p>${date.toString()}</p>`
+    );
+  });
 });
 
 app.get('/api/contacts', (request, response) => {
@@ -38,13 +41,14 @@ app.get('/api/contacts', (request, response) => {
 
 app.get('/api/contacts/:id', (req, res) => {
   console.log('Getting single contact');
-  const id = Number(req.params.id);
-  const contact = contacts.find((contact) => contact.id === id);
-  if (contact) {
-    res.json(contact);
-  } else {
-    res.status(404).end();
-  }
+  const id = req.params.id;
+  Contact.findById(id).then((contact) => {
+    if (contact) {
+      res.json(contact);
+    } else {
+      res.status(404).end();
+    }
+  });
 });
 
 app.post('/api/contacts', (req, res, next) => {
